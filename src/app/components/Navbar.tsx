@@ -31,8 +31,8 @@ export default function Navbar() {
         </li>
       </ul>
 
-      <div className="bg-gray-300 flex items-center gap-x-2 w-[166px] h-[36px]">
-        <input type="text" className="flex-grow p-1 bg-transparent outline-none" />
+      <div className="bg-gray-300 flex items-center gap-x-2 w-[166px] h-[36px] p-2">
+        <input type="text" className="flex-grow p-1 bg-transparent outline-none w-[100px]" />
         <FaSearch />
       </div>
       <div>
