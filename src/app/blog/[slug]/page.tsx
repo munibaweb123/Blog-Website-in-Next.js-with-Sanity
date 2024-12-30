@@ -1,24 +1,38 @@
-import { client } from "../../../sanity/lib/client";
-import { PortableText } from "next-sanity";
-import { urlFor } from "../../../sanity/lib/image";
-import Image from "next/image";
-import CommentSection from "../../../app/components/CommentSection";
+import Image from 'next/image';
+import { client } from '../../../sanity/lib/client'; // Sanity client
+import { urlFor } from '../../../sanity/lib/image'; // Image URL builder
+import { PortableText } from 'next-sanity'; // PortableText component for rich content
+import CommentSection from '../../../app/components/CommentSection'; // Comment section component
 
-// Ensure revalidate timing
+// Ensure revalidation timing (optional)
 export const revalidate = 60; // seconds
 
-// To create static pages for dynamic routes
-export default async function Page({ params }: { params: { slug: string } }) {
+// Generate static parameters for dynamic routes (replaces getStaticPaths)
+export async function generateStaticParams() {
+  // Fetch slugs for all posts
+  const query = `*[_type == 'post']{ "slug": slug.current }`;
+  const slugs = await client.fetch(query);
+
+  // Return a list of slugs to create static paths for
+  return slugs.map((item: { slug: string }) => ({
+    slug: item.slug,
+  }));
+}
+
+// Fetch and display the post data
+const PostPage = async ({ params }: { params: { slug: string } }) => {
   const { slug } = params;
 
-  // Query the post based on slug
-  const query = `*[_type=='post' && slug.current == $slug][0]{
-    title, summary, image, content,
+  // Query to get the post based on the slug
+  const query = `*[_type == 'post' && slug.current == "${slug}"]{
+    title, summary, image, content, 
     author->{bio, image, name}
-  }`;
-  
-  const post = await client.fetch(query, { slug });
+  }[0]`;
 
+  // Fetch the post data from Sanity
+  const post = await client.fetch(query);
+
+  // Handle case where post is not found
   if (!post) {
     return <div>Post not found</div>;
   }
@@ -31,10 +45,10 @@ export default async function Page({ params }: { params: { slug: string } }) {
           {post.title}
         </h1>
 
+        {/* Featured Image */}
         <div className="flex items-center justify-center">
-          {/* Featured Image */}
           <Image
-            src={post.image ? urlFor(post.image).url() : "/Logo.jpg"}
+            src={post.image ? urlFor(post.image).url() : '/Logo.jpg'}
             width={500}
             height={500}
             alt={post.title}
@@ -55,7 +69,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
         {/* Author Section */}
         <section className="px-2 sm:px-8 md:px-12 flex gap-2 xs:gap-4 sm:gap-6 items-start xs:items-center justify-start">
           <Image
-            src={post.author.image ? urlFor(post.author.image).url() : "/Logo.jpg"}
+            src={post.author.image ? urlFor(post.author.image).url() : '/Logo.jpg'}
             width={200}
             height={200}
             alt="author"
@@ -71,21 +85,19 @@ export default async function Page({ params }: { params: { slug: string } }) {
           </div>
         </section>
 
-        {/* Main Body of Blog */}
-        <section
-          className="text-lg leading-normal text-dark/80 dark:text-light/80
-          prose-h4:text-accentDarkPrimary prose-h4:text-3xl prose-h4:font-bold
-          prose-li:list-disc prose-li:list-inside prose-li:marker:text-accentDarkSecondary
-          prose-strong:text-dark dark:prose-strong:text-white"
-        >
-          <PortableText value={post.content} />
+        {/* Main Body of the Blog (Rich Text Content) */}
+        <section className="text-lg leading-normal text-dark/80 dark:text-light/80 prose-h4:text-accentDarkPrimary prose-h4:text-3xl prose-h4:font-bold prose-li:list-disc prose-li:list-inside prose-li:marker:text-accentDarkSecondary prose-strong:text-dark dark:prose-strong:text-white">
+          <PortableText value={post.content} /> {/* Render rich text content */}
         </section>
       </article>
 
+      {/* Comment Section */}
       <div>
         <h1 className="text-2xl md:text-4xl text-center">Welcome to the Comment Section</h1>
-        <CommentSection />
+        <CommentSection /> {/* Add your comment section component here */}
       </div>
     </div>
   );
-}
+};
+
+export default PostPage;
