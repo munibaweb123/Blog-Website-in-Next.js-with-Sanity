@@ -1,40 +1,67 @@
-import Image from 'next/image';
+'use client'
+
+import { useState, useEffect } from 'react';
 import { client } from '../../../sanity/lib/client'; // Sanity client
 import { urlFor } from '../../../sanity/lib/image'; // Image URL builder
-import { PortableText } from 'next-sanity'; // PortableText component for rich content
+import { PortableText, PortableTextBlock } from 'next-sanity'; // PortableText component for rich content
+import Image from 'next/image'; // Image component from Next.js
+import { useParams } from 'next/navigation'; // For fetching the current route parameter (slug)
 import CommentSection from '../../../app/components/CommentSection'; // Comment section component
 
-// Ensure revalidation timing (optional)
-export const revalidate = 60; // seconds
-
-// Generate static parameters for dynamic routes (replaces getStaticPaths)
-export async function generateStaticParams() {
-  // Fetch slugs for all posts
-  const query = `*[_type == 'post']{ "slug": slug.current }`;
-  const slugs = await client.fetch(query);
-
-  // Return a list of slugs to create static paths for
-  return slugs.map((item: { slug: string }) => ({
-    slug: item.slug,
-  }));
+// Define the types for the post data
+interface Author {
+  bio: string;
+  image: string;
+  name: string;
 }
 
-// Fetch and display the post data
-const PostPage = async ({ params }: { params: { slug: string } }) => {
-  const { slug } = params;
+interface Post {
+  title: string;
+  summary: string;
+  image: string;
+  content: PortableTextBlock[]; // Assuming rich text; you can refine this if needed
+  author: Author;
+}
 
-  // Query to get the post based on the slug
-  const query = `*[_type == 'post' && slug.current == "${slug}"]{
-    title, summary, image, content, 
-    author->{bio, image, name}
-  }[0]`;
+// PostPage component using state hooks
+const PostPage = () => {
+  const { slug } = useParams(); // Get the slug from the URL
 
-  // Fetch the post data from Sanity
-  const post = await client.fetch(query);
+  // State to hold post data and loading state
+  const [post, setPost] = useState<Post | null>(null); // Initial type defined as Post | null
+  const [loading, setLoading] = useState(true);
 
-  // Handle case where post is not found
+  // Fetch the post data when the component mounts
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (slug) {
+        setLoading(true); // Start loading data
+        const query = `*[_type == 'post' && slug.current == $slug] {
+          title, summary, image, content, 
+          author->{bio, image, name}
+        }[0]`;
+
+        try {
+          const postData = await client.fetch(query, { slug }); // Fetch post data from Sanity
+          setPost(postData); // Set the post data in state
+        } catch (error) {
+          console.error("Error fetching post:", error);
+        } finally {
+          setLoading(false); // Stop loading
+        }
+      }
+    };
+
+    fetchPost(); // Call the fetch function
+  }, [slug]); // Re-fetch data when slug changes
+
+  // Handle loading state or if post is not found
+  if (loading) {
+    return <div>Loading...</div>; // Show loading message
+  }
+
   if (!post) {
-    return <div>Post not found</div>;
+    return <div>Post not found</div>; // Show message if no post is found
   }
 
   return (
@@ -69,7 +96,7 @@ const PostPage = async ({ params }: { params: { slug: string } }) => {
         {/* Author Section */}
         <section className="px-2 sm:px-8 md:px-12 flex gap-2 xs:gap-4 sm:gap-6 items-start xs:items-center justify-start">
           <Image
-            src={post.author.image ? urlFor(post.author.image).url() : '/Logo.jpg'}
+            src={post.author?.image ? urlFor(post.author.image).url() : '/Logo.jpg'}
             width={200}
             height={200}
             alt="author"
@@ -77,10 +104,10 @@ const PostPage = async ({ params }: { params: { slug: string } }) => {
           />
           <div className="flex flex-col gap-1">
             <h3 className="text-xl font-bold text-dark dark:text-light">
-              {post.author.name}
+              {post.author?.name}
             </h3>
             <p className="italic text-xs xs:text-sm sm:text-base text-dark/80 dark:text-light/80">
-              {post.author.bio}
+              {post.author?.bio}
             </p>
           </div>
         </section>
