@@ -4,7 +4,7 @@ import BlogCard from "./BlogCard";
 interface Post {
     title:string,
     summary:string,
-    image:any,
+    image:string,
     slug:string
 }
 export default async function Post(){

@@ -5,7 +5,7 @@ import Link from "next/link";
 interface Post {
   title:string,
   summary:string,
-  image:any,
+  image:string,
   slug:string
 }
 

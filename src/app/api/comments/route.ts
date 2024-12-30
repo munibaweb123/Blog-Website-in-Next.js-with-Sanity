@@ -6,7 +6,7 @@ interface Comment {
   comment: string;
 }
 
-let comments: Comment[] = []; // Simulated database
+const comments: Comment[] = []; // Simulated database
 
 // GET Handler: Fetch all comments
 export async function GET() {

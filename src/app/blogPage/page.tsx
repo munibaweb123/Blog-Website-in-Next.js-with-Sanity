@@ -6,7 +6,7 @@ import BlogCard from "../components/BlogCard";
 interface Post {
     title:string,
     summary:string,
-    image:any,
+    image:string,
     slug:string
 }
 export default async function blogPage(){

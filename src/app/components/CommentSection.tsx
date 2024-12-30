@@ -12,6 +12,7 @@ const CommentSection = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newName, setNewName] = useState<string>(''); // Name field
   const [newComment, setNewComment] = useState<string>(''); // Comment field
+  const [loading, setLoading] = useState<boolean>(false); // For loading state
 
   // Fetch comments when the component mounts
   useEffect(() => {
@@ -33,9 +34,13 @@ const CommentSection = () => {
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!newName.trim() || !newComment.trim()) return;
+    if (!newName.trim() || !newComment.trim()) {
+      alert('Both name and comment fields are required!');
+      return;
+    }
 
     try {
+      setLoading(true);
       const response = await fetch('/api/comments', {
         method: 'POST',
         headers: {
@@ -50,11 +55,7 @@ const CommentSection = () => {
 
       // Add the new comment to the local state
       setComments((prevComments) => [
-        {
-          id: data.id,
-          name: data.name,
-          comment: data.comment,
-        },
+        { id: data.id, name: data.name, comment: data.comment },
         ...prevComments,
       ]);
 
@@ -62,6 +63,8 @@ const CommentSection = () => {
       setNewComment('');
     } catch (error) {
       console.error('Error submitting comment:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,22 +72,21 @@ const CommentSection = () => {
   const handleDeleteComment = async (id: string) => {
     try {
       const response = await fetch(`/api/comments/${id}`, {
-        method: 'DELETE', // Ensure DELETE method is used
+        method: 'DELETE',
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Failed to delete comment: ${errorData.message}`);
       }
-  
-      // Optionally update the UI by removing the deleted comment
+
+      // Update the UI by removing the deleted comment
       setComments((prevComments) => prevComments.filter((comment) => comment.id !== id));
     } catch (error) {
       console.error(error);
       alert('Failed to delete comment');
     }
   };
-  
 
   return (
     <div className="max-w-3xl mx-auto p-4 bg-gray-100 rounded-lg shadow-md">
@@ -97,20 +99,21 @@ const CommentSection = () => {
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           placeholder="Your name"
-          className="p-2 border border-gray-300 rounded-lg bg-slate-200"
+          className="p-2 border border-gray-300 rounded-lg bg-white"
         />
         <textarea
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Write a comment..."
           rows={4}
-          className="p-2 border border-gray-300 rounded-lg bg-slate-200"
+          className="p-2 border border-gray-300 rounded-lg bg-white"
         />
         <button
           type="submit"
           className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
+          disabled={loading}
         >
-          Submit Comment
+          {loading ? 'Submitting...' : 'Submit Comment'}
         </button>
       </form>
 
