@@ -10,9 +10,9 @@ interface Comment {
 // Define the DELETE handler
 export async function DELETE(
   request: Request,
-  context: { params: { id: string } } // Explicitly type the `params` correctly
+  { params }: { params: { id: string } } // Ensure params is properly typed
 ) {
-  const { id } = context.params; // Destructure `id` from `params`
+  const { id } = params; // Destructure id from params
 
   try {
     // Example in-memory database for comments with proper type
