@@ -40,15 +40,15 @@ export default function Contact() {
         <title>Contact Us - Tech Blog</title>
         <meta name="description" content="Contact the Tech Blog team for inquiries, feedback, or support." />
       </Head>
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-        <div className="max-w-3xl w-full bg-white shadow-lg rounded-lg p-6 sm:p-10">
-          <h2 className="text-2xl font-extrabold text-gray-900 text-center mb-6">Contact Us</h2>
-          <p className="text-gray-600 text-center mb-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+        <div className="max-w-3xl w-full bg-white dark:bg-black shadow-lg rounded-lg p-6 sm:p-10">
+          <h2 className="text-2xl font-extrabold text-center mb-6">Contact Us</h2>
+          <p className="text-gray-600 dark:text-gray-200 text-center mb-8">
             Have a question, feedback, or partnership opportunity? Get in touch with us.
           </p>
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                 Your Name
               </label>
               <input
@@ -63,7 +63,7 @@ export default function Contact() {
               />
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                 Your Email
               </label>
               <input
@@ -78,7 +78,7 @@ export default function Contact() {
               />
             </div>
             <div>
-              <label htmlFor="message" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                 Message
               </label>
               <textarea
@@ -96,8 +96,8 @@ export default function Contact() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                  isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                className={`inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md ${
+                  isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-700 hover:text-blue-50"
                 } shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
               >
                 {isSubmitting ? "Sending..." : "Send Message"}
