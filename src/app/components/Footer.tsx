@@ -43,7 +43,7 @@ function Footer() {
           </ul>
 
            </div>
-           <div className='flex flex-col items-center gap-y-2 rounded-s p-2 shadow-s'>
+           <div className='flex flex-col items-center gap-y-2 rounded-s p-2 shadow-sm dark:bg-black bg-white'>
            <h2 className='text-2xl font-bold'>Contact Us</h2>
            <p>Get blog articles and offers via email</p>
            <div className="hidden md:flex bg-gray-200 items-center gap-x-2 w-full h-[36px] px-2 rounded-lg">
